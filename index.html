@@ -1,65 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Recipe Finder — Share + Theme</title>
+
+  <!-- No favicon -->
+
+  <meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f6f8fc" media="(prefers-color-scheme: light)">
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+    :root{ --bg:#0b1020; --panel:#0f172a; --text:#e5e7eb; --muted:#9ca3af; --accent:#60a5fa; --accent2:#93c5fd; --border:#1f2937; --ring:#3b82f6; }
+    :root[data-theme="light"]{ --bg:#f8fafc; --panel:#ffffff; --text:#0f172a; --muted:#475569; --accent:#2563eb; --accent2:#3b82f6; --border:#e5e7eb; --ring:#2563eb; }
+    :root[data-theme="dark"]{ --bg:#0b1020; --panel:#0f172a; --text:#e5e7eb; --muted:#9ca3af; --accent:#60a5fa; --accent2:#93c5fd; --border:#1f2937; --ring:#3b82f6; }
 
-.variable-proximity {
-  font-family: 'Roboto Flex', sans-serif;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-    :root{ --bg:#0b1020; --panel:#0f172a; --text:#e5e7eb; --muted:#9ca3af; --accent:#60a5fa; --accent2:#93c5fd; --border:#1f2937; }
-    :root[data-theme="light"]{ --bg:#f8fafc; --panel:#ffffff; --text:#0f172a; --muted:#475569; --accent:#2563eb; --accent2:#3b82f6; --border:#e5e7eb; }
-    :root[data-theme="dark"]{ --bg:#0b1020; --panel:#0f172a; --text:#e5e7eb; --muted:#9ca3af; --accent:#60a5fa; --accent2:#93c5fd; --border:#1f2937; }
     *{box-sizing:border-box}
-    body{margin:0;min-height:100svh;color:var(--text);background:radial-gradient(1200px 900px at 15% -10%,#1e293b 0%, var(--bg) 60%);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;display:grid;place-items:start center;padding:24px}
-    .app{width:min(1100px,100%)}
+    body{
+      margin:0;min-height:100svh;color:var(--text);
+      background:radial-gradient(1200px 900px at 15% -10%,#1e293b 0%, var(--bg) 60%);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      display:grid;place-items:start stretch;padding:20px;
+    }
+
+    .app{width:100%;max-width:none}
     header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
     .brand{display:flex;gap:10px;align-items:center}
     .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2563eb);display:grid;place-items:center;box-shadow:0 8px 26px #2563eb55}
     .brand h1{margin:0;font-size:20px}
-    .searchbar{display:flex;gap:8px;flex:1;max-width:700px}
-    .searchbar input, .select{flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--panel);color:var(--text);outline:none}
-    .btn{cursor:pointer;border:1px solid var(--border);background:var(--panel);color:var(--text);padding:12px 14px;border-radius:12px;font-weight:600}
+    .searchbar{display:flex;gap:8px;flex:1;max-width:980px}
+
+    /* shadcn-like controls (no dependency) */
+    .select, .input, .btn{
+      border:1px solid var(--border);background:var(--panel);color:var(--text);
+      padding:12px 14px;border-radius:12px;outline:none;transition:box-shadow .15s, border-color .15s;
+    }
+    .input{width:100%}
+    .select{
+      min-width:200px;appearance:none;background-image:
+        linear-gradient(45deg,transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%),
+        linear-gradient(to right, transparent, transparent);
+      background-position:
+        calc(100% - 20px) calc(50% - 3px),
+        calc(100% - 14px) calc(50% - 3px),
+        calc(100% - 2.5rem) 0;
+      background-size:6px 6px, 6px 6px, 1px 100%;
+      background-repeat:no-repeat;
+      padding-right:2.6rem;
+      cursor:pointer;
+    }
+    .select:focus, .input:focus, .btn:focus{
+      box-shadow:0 0 0 3px color-mix(in srgb, var(--ring) 30%, transparent);
+      border-color:color-mix(in srgb, var(--ring) 60%, var(--border));
+    }
+
+    .btn{cursor:pointer;font-weight:600}
     .btn:hover{box-shadow:0 0 0 1px var(--border), 0 6px 16px #0008}
     .btn-accent{background:linear-gradient(135deg,var(--accent),#2563eb);border:none;color:white}
+    .btn-icon{padding:10px 12px;display:inline-grid;place-items:center}
+    .btn-tiny{padding:6px 8px;font-size:12px}
 
     .filters{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
-    .select{min-width:180px}
 
-    .wrap{display:grid;gap:16px;grid-template-columns:1.2fr .8fr}
-    @media (max-width:1000px){.wrap{grid-template-columns:1fr}}
+    /* Immersive two-column layout */
+    .wrap{display:grid;gap:16px;grid-template-columns:2fr 1fr}
+    @media (max-width:1100px){.wrap{grid-template-columns:1fr}}
 
-    .card{background:linear-gradient(180deg,var(--panel), var(--panel));border:1px solid var(--border);border-radius:18px;box-shadow:0 10px 30px #0008;padding:16px}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 10px 30px #0008;padding:16px}
     .card h2{margin:0 0 8px 0;font-size:16px;color:var(--accent2)}
 
-    .grid{display:grid;gap:12px;grid-template-columns:repeat(3,1fr)}
-    @media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
-    @media (max-width:560px){.grid{grid-template-columns:1fr}}
+    /* Responsive results grid */
+    .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));}
 
     .meal{display:grid;grid-template-rows:auto 1fr auto;gap:8px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel)}
-    .meal img{width:100%;height:160px;object-fit:cover}
+    .meal img{width:100%;height:180px;object-fit:cover}
     .meal .title{font-weight:700;padding:8px 10px}
     .meal .meta{color:var(--muted);font-size:12px;padding:0 10px 8px}
     .meal .row{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:0 10px 10px}
 
     .pagination{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:10px}
-
     .status{color:var(--muted);font-size:12px;margin-top:6px}
 
     .favorites{display:grid;gap:10px}
@@ -67,8 +87,8 @@
     .fav img{width:52px;height:52px;border-radius:8px;object-fit:cover}
     .fav .name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-    dialog{border:none;border-radius:16px;padding:0;max-width:min(820px,90vw);width:100%;background:var(--panel);color:var(--text)}
-    .modal{display:grid;grid-template-columns:260px 1fr}
+    dialog{border:none;border-radius:16px;padding:0;max-width:min(920px,92vw);width:100%;background:var(--panel);color:var(--text)}
+    .modal{display:grid;grid-template-columns:300px 1fr;position:relative}
     @media (max-width:720px){.modal{grid-template-columns:1fr}}
     .modal img{width:100%;height:100%;object-fit:cover;border-top-left-radius:16px;border-bottom-left-radius:16px}
     .modal .content{padding:16px}
@@ -76,46 +96,86 @@
     .ilist{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
     @media (max-width:560px){.ilist{grid-template-columns:1fr}}
     .ilist .item{border:1px solid var(--border);border-radius:10px;padding:6px 8px;font-size:14px}
-    .steps{white-space:pre-wrap;font-size:14px}
+    .steps{font-size:14px}
+    .steps ol{margin:0;padding-left:1.25rem;display:grid;gap:.35rem}
+    .modal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    a.btn{display:inline-flex;text-decoration:none;align-items:center;justify-content:center}
+
+    @media (min-width:1280px){ body{padding-inline:32px} }
+
+    /* ===== Light mode improvements ===== */
+    :root[data-theme="light"]{
+      --bg:#f6f8fc;
+      --panel:#ffffff;
+      --text:#0b1220;
+      --muted:#475569;
+      --accent:#1d4ed8;
+      --accent2:#2563eb;
+      --border:#e5e7eb;
+      --ring:#3b82f6;
+      color-scheme: light;
+    }
+    :root[data-theme="light"] body{
+      background: radial-gradient(1200px 900px at 20% -10%, #eaf0ff 0%, transparent 55%), #f6f8fc;
+    }
+    :root[data-theme="light"] .card{
+      border-color:#e6eaf2;
+      box-shadow:0 1px 2px rgba(16,24,40,0.04),0 10px 30px rgba(16,24,40,0.06);
+    }
+    :root[data-theme="light"] .select,
+    :root[data-theme="light"] .input,
+    :root[data-theme="light"] .btn{ background:var(--panel); border-color:#dee3ea; }
+    :root[data-theme="light"] .btn-accent{ color:#fff; background:linear-gradient(135deg,var(--accent),#2563eb); }
+    :root[data-theme="light"] .meal{ border-color:#e7ebf2; background:var(--panel);}
+    :root[data-theme="light"] .meal .meta,
+    :root[data-theme="light"] .status{ color:#64748b; }
+    :root[data-theme="light"] dialog{ background:var(--panel); color:var(--text); border:1px solid #e6eaf2;
+      box-shadow:0 1px 2px rgba(16,24,40,0.04), 0 16px 48px rgba(16,24,40,0.14);}
+    :root[data-theme="light"] dialog::backdrop{ background:rgba(15,23,42,0.28);}
+    :root[data-theme="light"] .ilist .item{ border-color:#e6eaf2; background:#fff;}
+    :root[data-theme="light"] .pagination .btn,
+    :root[data-theme="light"] .tools .btn{ background:#fff; border-color:#e3e8ef; }
+    :root[data-theme="light"] .meal img,
+    :root[data-theme="light"] .modal img{ filter:saturate(1.02) contrast(1.02);}
   </style>
 </head>
 <body>
   <div class="app">
     <header>
       <div class="brand">
-        <div class="logo">🍳</div>
+        <div class="logo" aria-hidden="true">🍳</div>
         <h1>Recipe Finder</h1>
       </div>
-      <div class="searchbar">
-        <input id="q" type="text" placeholder="Search recipes (e.g., pasta, chicken, biryani)"/>
-        <button id="search" class="btn btn-accent">Search</button>
+      <div class="searchbar" role="search">
+        <input id="q" class="input" type="text" placeholder="Search recipes (e.g., pasta, chicken, biryani)" aria-label="Search recipes"/>
+        <button id="search" class="btn btn-accent" aria-label="Search">Search</button>
       </div>
       <div class="tools" style="display:flex;gap:8px;align-items:center">
-        <button id="share" class="btn" title="Copy shareable link">🔗 Share</button>
-        <button id="theme" class="btn" title="Toggle light/dark">🌗 Theme</button>
+        <button id="share" class="btn btn-icon" title="Copy/share link" aria-label="Share search">🔗</button>
+        <button id="theme" class="btn btn-icon" title="Toggle light/dark" aria-label="Toggle theme">🌗</button>
       </div>
     </header>
 
     <section class="wrap">
-      <div class="card">
-        <h2>Results</h2>
+      <div class="card" aria-labelledby="results-heading">
+        <h2 id="results-heading">Results</h2>
         <div class="filters">
-          <select id="cat" class="select"><option value="">All Categories</option></select>
-          <select id="area" class="select"><option value="">All Cuisines</option></select>
-          <input id="ing" class="select" placeholder="Filter by ingredient (e.g., tomato)" />
-          <button id="clear" class="btn">Clear</button>
+          <select id="cat" class="select" aria-label="Filter by category"><option value="">All Categories</option></select>
+          <select id="area" class="select" aria-label="Filter by cuisine"><option value="">All Cuisines</option></select>
+          <input id="ing" class="select" placeholder="Filter by ingredient (e.g., tomato)" aria-label="Filter by ingredient"/>
+          <button id="clear" class="btn" aria-label="Clear filters">Clear</button>
         </div>
-        <div id="status" class="status"></div>
+        <div id="status" class="status" aria-live="polite"></div>
         <div id="grid" class="grid" aria-live="polite"></div>
         <div class="pagination">
-          <button id="prev" class="btn">Prev</button>
-          <span id="pageInfo" class="status"></span>
-          <button id="next" class="btn">Next</button>
+          <button id="prev" class="btn" aria-label="Previous page">Prev</button>
+          <span id="pageInfo" class="status" aria-live="polite"></span>
+          <button id="next" class="btn" aria-label="Next page">Next</button>
         </div>
       </div>
 
-      <div class="card">
-        <h2>Favorites</h2>
+      <div class="card" aria-labelledby="favs-heading">
+        <h2 id="favs-heading">Favorites</h2>
         <div id="favs" class="favorites"></div>
       </div>
     </section>
@@ -123,20 +183,21 @@
     <footer class="status">Data from <a href="https://www.themealdb.com/api.php" target="_blank" rel="noopener" style="color:var(--accent2)">TheMealDB</a> · Shareable links encode your search & filters</footer>
   </div>
 
-  <dialog id="modal">
+  <dialog id="modal" aria-labelledby="mTitle" aria-modal="true">
     <div class="modal">
       <img id="mImg" alt="Meal photo"/>
       <div class="content">
-        <button id="mClose" class="btn close">✖</button>
+        <button id="mClose" class="btn close btn-icon" aria-label="Close">✖</button>
         <h2 id="mTitle" style="margin-top:0"></h2>
         <div class="status" id="mMeta"></div>
         <h3>Ingredients</h3>
         <div id="mIng" class="ilist"></div>
         <h3>Instructions</h3>
         <div id="mSteps" class="steps"></div>
-        <div style="margin-top:10px">
+        <div class="modal-actions">
           <a id="mSource" href="#" target="_blank" rel="noopener" class="btn">Source</a>
           <a id="mYoutube" href="#" target="_blank" rel="noopener" class="btn">YouTube</a>
+          <button id="mShare" class="btn btn-accent" aria-label="Share this recipe">Share Recipe</button>
         </div>
       </div>
     </div>
@@ -151,24 +212,29 @@
 
     // ===== State =====
     const state = {
-      all: [], page: 1, pageSize: 9,
+      all: [], page: 1, pageSize: 12,
       q: '', cat: '', area: '', ing: '',
       cats: [], areas: [],
       favs: JSON.parse(localStorage.getItem('rf_favs')||'[]'),
-      theme: localStorage.getItem('rf_theme') || 'dark'
+      theme: localStorage.getItem('rf_theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'),
+      selectedMeal: null
     };
 
     // ===== Theme =====
-    function applyTheme(t){ document.documentElement.setAttribute('data-theme', t); localStorage.setItem('rf_theme', t); }
+    function applyTheme(t){
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('rf_theme', t);
+    }
 
     // ===== URL Share / Sync =====
-    function paramsFromState(){
+    function paramsFromState(extra={}){
       const p = new URLSearchParams();
       if(state.q) p.set('q', state.q);
       if(state.cat) p.set('cat', state.cat);
       if(state.area) p.set('area', state.area);
       if(state.ing) p.set('ing', state.ing);
       if(state.page>1) p.set('page', String(state.page));
+      Object.entries(extra).forEach(([k,v])=> v!=null && p.set(k, v));
       return p;
     }
     function updateURL(){ history.replaceState(null, '', `?${paramsFromState().toString()}`); }
@@ -179,8 +245,11 @@
       state.area = p.get('area')||'';
       state.ing = p.get('ing')||'';
       state.page = Math.max(1, parseInt(p.get('page')||'1',10));
+      const deepId = p.get('id');
+
       // reflect in UI
       $('#q').value = state.q; $('#cat').value = state.cat; $('#area').value = state.area; $('#ing').value = state.ing;
+      return deepId;
     }
 
     // ===== Init filters =====
@@ -201,18 +270,38 @@
       const base = await j(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(q)}`);
       let list = base.meals || [];
 
+      // If no text query but filters present, intersect filter endpoints and hydrate details
       if(!q && (state.cat || state.area || state.ing)){
         const idsSets = [];
-        if(state.cat){ const r = await j(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(state.cat)}`); idsSets.push(new Set((r.meals||[]).map(m=>m.idMeal))); }
-        if(state.area){ const r = await j(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${encodeURIComponent(state.area)}`); idsSets.push(new Set((r.meals||[]).map(m=>m.idMeal))); }
-        if(state.ing){ const r = await j(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(state.ing)}`); idsSets.push(new Set((r.meals||[]).map(m=>m.idMeal))); }
-        let ids = null; for(const s of idsSets){ ids = ids? new Set([...ids].filter(x=>s.has(x))) : s; }
-        if(ids){ const take = [...ids].slice(0,50); const details = await Promise.all(take.map(id=> j(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`))); list = details.map(d=>d.meals&&d.meals[0]).filter(Boolean); } else { list = []; }
+        if(state.cat){
+          const r = await j(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(state.cat)}`);
+          idsSets.push(new Set((r.meals||[]).map(m=>m.idMeal)));
+        }
+        if(state.area){
+          const r = await j(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${encodeURIComponent(state.area)}`);
+          idsSets.push(new Set((r.meals||[]).map(m=>m.idMeal)));
+        }
+        if(state.ing){
+          const r = await j(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(state.ing)}`);
+          idsSets.push(new Set((r.meals||[]).map(m=>m.idMeal)));
+        }
+        let ids = null;
+        for(const s of idsSets){ ids = ids ? new Set([...ids].filter(x=>s.has(x))) : s; }
+        if(ids && ids.size){
+          const take = [...ids].slice(0,100);
+          const details = await Promise.all(take.map(id=> j(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)));
+          list = details.map(d=>d.meals && d.meals[0]).filter(Boolean);
+        } else {
+          list = [];
+        }
       }
 
-      if(state.cat) list = list.filter(m=>m.strCategory===state.cat);
+      // Client-side refine (covers the case where text search returns wide results)
+      if(state.cat)  list = list.filter(m=>m.strCategory===state.cat);
       if(state.area) list = list.filter(m=>m.strArea===state.area);
-      if(state.ing) list = list.filter(m=> Object.entries(m).some(([k,v])=> k.startsWith('strIngredient') && v && v.toLowerCase().includes(state.ing.toLowerCase())));
+      if(state.ing)  list = list.filter(m=>
+        Object.entries(m).some(([k,v])=> k.startsWith('strIngredient') && v && v.toLowerCase().includes(state.ing.toLowerCase()))
+      );
 
       state.all = list; state.page = 1; render(); updateURL();
       status(list.length?`Found ${list.length} recipe(s)`: 'No recipes. Try a different search.');
@@ -236,8 +325,8 @@
         <div class="title">${m.strMeal}</div>
         <div class="meta">${m.strCategory||''} ${m.strArea? '· '+m.strArea: ''}</div>
         <div class="row">
-          <button class="btn btn-accent view">View</button>
-          <button class="btn favbtn">❤</button>
+          <button class="btn btn-accent view" aria-label="View recipe for ${m.strMeal}">View</button>
+          <button class="btn favbtn" aria-label="Toggle favorite">❤</button>
         </div>`;
       el.querySelector('.view').onclick = ()=> openModal(m.idMeal);
       const favBtn = el.querySelector('.favbtn');
@@ -254,9 +343,14 @@
         el.innerHTML = `
           <img src="${m.strMealThumb}" alt="${m.strMeal}"/>
           <div class="name">${m.strMeal}</div>
-          <div><button class="btn btn-tiny open">Open</button> <button class="btn btn-tiny rem">Remove</button></div>`;
+          <div>
+            <button class="btn btn-tiny open">Open</button>
+            <button class="btn btn-tiny share-one" title="Share" aria-label="Share">🔗</button>
+            <button class="btn btn-tiny rem">Remove</button>
+          </div>`;
         el.querySelector('.open').onclick = ()=> openModal(m.idMeal);
         el.querySelector('.rem').onclick = ()=> { removeFav(m.idMeal); renderFavs(); render(); };
+        el.querySelector('.share-one').onclick = ()=> shareMeal({ idMeal:m.idMeal, strMeal:m.strMeal });
         f.appendChild(el);
       });
     }
@@ -272,15 +366,71 @@
     async function openModal(id){
       const d = await j(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
       const m = d.meals && d.meals[0]; if(!m) return;
+      state.selectedMeal = m;
+
       $('#mImg').src = m.strMealThumb; $('#mTitle').textContent = m.strMeal;
       $('#mMeta').textContent = `${m.strCategory||''}${m.strArea? ' · '+m.strArea: ''}`;
-      const list = []; for(let i=1;i<=20;i++){ const ing=m[`strIngredient${i}`]; const meas=m[`strMeasure${i}`]; if(ing && ing.trim()) list.push(`${ing}${meas? ' — '+meas: ''}`); }
+
+      // Ingredients
+      const list = [];
+      for(let i=1;i<=20;i++){
+        const ing=m[`strIngredient${i}`]; const meas=m[`strMeasure${i}`];
+        if(ing && ing.trim()) list.push(`${ing}${meas? ' — '+meas: ''}`);
+      }
       $('#mIng').innerHTML = list.map(x=>`<div class="item">${x}</div>`).join('');
-      $('#mSteps').textContent = m.strInstructions || '';
-      $('#mSource').href = m.strSource || '#'; $('#mSource').style.display = m.strSource? 'inline-block':'none';
-      $('#mYoutube').href = m.strYoutube || '#'; $('#mYoutube').style.display = m.strYoutube? 'inline-block':'none';
+
+      // Instructions → numbered points
+      const steps = splitSteps(m.strInstructions||'');
+      $('#mSteps').innerHTML = steps.length
+        ? `<ol>${steps.map(s=>`<li>${escapeHtml(s)}</li>`).join('')}</ol>`
+        : '<div class="status">No instructions available.</div>';
+
+      // Links
+      $('#mSource').href = m.strSource || '#'; $('#mSource').style.display = m.strSource? 'inline-flex':'none';
+      $('#mYoutube').href = m.strYoutube || '#'; $('#mYoutube').style.display = m.strYoutube? 'inline-flex':'none';
+
       $('#modal').showModal();
     }
+
+    function splitSteps(text){
+      if(!text) return [];
+      // Normalize whitespace
+      const t = text.replace(/\r/g,' ').replace(/\s+\n\s+/g,'\n').trim();
+      // Split on sentence end: ., !, ? followed by space/newline and next capital/number
+      const raw = t.split(/(?<=[.!?])\s+(?=[A-Z0-9])/g);
+      return raw.map(s=>s.replace(/\s+/g,' ').trim()).filter(Boolean);
+    }
+    function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    // ===== Pagination =====
+    $('#prev').onclick = ()=>{ if(state.page>1){ state.page--; render(); } };
+    $('#next').onclick = ()=>{ const total = Math.ceil(state.all.length/state.pageSize); if(state.page<total){ state.page++; render(); } };
+
+    // ===== Share (page-wide search) =====
+    async function shareCurrent(){
+      const url = `${location.origin}${location.pathname}?${paramsFromState().toString()}`;
+      const title = 'Recipe Finder Search';
+      const text = 'Check out these recipes!';
+      if(navigator.share){
+        try{ await navigator.share({ title, text, url }); status('Shared!'); return; }catch(e){ /* canceled or failed */ }
+      }
+      try{ await navigator.clipboard.writeText(url); status('Link copied to clipboard!'); }
+      catch{ prompt('Copy this URL', url); }
+    }
+    $('#share').onclick = shareCurrent;
+
+    // ===== Share (specific recipe) =====
+    async function shareMeal(m){
+      const url = `${location.origin}${location.pathname}?${paramsFromState({ id: m.idMeal }).toString()}`;
+      const title = m.strMeal || 'Recipe';
+      const text = `Check out this recipe: ${title}`;
+      if(navigator.share){
+        try{ await navigator.share({ title, text, url }); status('Shared!'); return; }catch(e){ /* canceled or failed */ }
+      }
+      try{ await navigator.clipboard.writeText(url); status('Recipe link copied!'); }
+      catch{ prompt('Copy this URL', url); }
+    }
+    $('#mShare').onclick = ()=>{ if(state.selectedMeal) shareMeal(state.selectedMeal); };
 
     // ===== Events =====
     $('#search').onclick = ()=>{ state.q = $('#q').value; search(); };
@@ -292,18 +442,10 @@
     $('#ing').addEventListener('input', debounce(()=>{ state.ing = $('#ing').value.trim(); search(); }, 500));
     $('#clear').onclick = ()=>{ $('#q').value=''; $('#cat').value=''; $('#area').value=''; $('#ing').value=''; state.q=state.cat=state.area=state.ing=''; search(); };
 
-    $('#prev').onclick = ()=>{ if(state.page>1){ state.page--; render(); } };
-    $('#next').onclick = ()=>{ const total = Math.ceil(state.all.length/state.pageSize); if(state.page<total){ state.page++; render(); } };
-
-    // Shareable link
-    $('#share').onclick = async ()=>{
-      const url = `${location.origin}${location.pathname}?${paramsFromState().toString()}`;
-      try{ await navigator.clipboard.writeText(url); status('Link copied to clipboard!'); } catch{ prompt('Copy this URL', url); }
-    };
-
     // Theme toggle
     $('#theme').onclick = ()=>{ state.theme = state.theme==='dark'?'light':'dark'; applyTheme(state.theme); };
 
+    // Modal close behaviors
     $('#mClose').onclick = ()=> $('#modal').close();
     $('#modal').addEventListener('click', (e)=>{ const r=e.target.getBoundingClientRect?.(); if(!r || e.target===e.currentTarget) e.currentTarget.close(); });
 
@@ -311,197 +453,13 @@
     (async function(){
       applyTheme(state.theme);
       await initFilters();
-      loadFromURL();
+      const deepId = loadFromURL();
+
       if(state.q || state.cat || state.area || state.ing){ await search(); }
       else { status('Try a search term like "chicken" or use the filters.'); render(); }
+
+      if(deepId){ try{ await openModal(deepId); } catch{} }
     })();
-
-    import { forwardRef, useMemo, useRef, useEffect } from 'react';
-import { motion } from 'motion/react';
-import './VariableProximity.css';
-
-function useAnimationFrame(callback) {
-  useEffect(() => {
-    let frameId;
-    const loop = () => {
-      callback();
-      frameId = requestAnimationFrame(loop);
-    };
-    frameId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(frameId);
-  }, [callback]);
-}
-
-function useMousePositionRef(containerRef) {
-  const positionRef = useRef({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const updatePosition = (x, y) => {
-      if (containerRef?.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        positionRef.current = { x: x - rect.left, y: y - rect.top };
-      } else {
-        positionRef.current = { x, y };
-      }
-    };
-
-    const handleMouseMove = ev => updatePosition(ev.clientX, ev.clientY);
-    const handleTouchMove = ev => {
-      const touch = ev.touches[0];
-      updatePosition(touch.clientX, touch.clientY);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('touchmove', handleTouchMove);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, [containerRef]);
-
-  return positionRef;
-}
-
-const VariableProximity = forwardRef((props, ref) => {
-  const {
-    label,
-    fromFontVariationSettings,
-    toFontVariationSettings,
-    containerRef,
-    radius = 50,
-    falloff = 'linear',
-    className = '',
-    onClick,
-    style,
-    ...restProps
-  } = props;
-
-  const letterRefs = useRef([]);
-  const interpolatedSettingsRef = useRef([]);
-  const mousePositionRef = useMousePositionRef(containerRef);
-  const lastPositionRef = useRef({ x: null, y: null });
-
-  const parsedSettings = useMemo(() => {
-    const parseSettings = settingsStr =>
-      new Map(
-        settingsStr
-          .split(',')
-          .map(s => s.trim())
-          .map(s => {
-            const [name, value] = s.split(' ');
-            return [name.replace(/['"]/g, ''), parseFloat(value)];
-          })
-      );
-
-    const fromSettings = parseSettings(fromFontVariationSettings);
-    const toSettings = parseSettings(toFontVariationSettings);
-
-    return Array.from(fromSettings.entries()).map(([axis, fromValue]) => ({
-      axis,
-      fromValue,
-      toValue: toSettings.get(axis) ?? fromValue
-    }));
-  }, [fromFontVariationSettings, toFontVariationSettings]);
-
-  const calculateDistance = (x1, y1, x2, y2) => Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-
-  const calculateFalloff = distance => {
-    const norm = Math.min(Math.max(1 - distance / radius, 0), 1);
-    switch (falloff) {
-      case 'exponential':
-        return norm ** 2;
-      case 'gaussian':
-        return Math.exp(-((distance / (radius / 2)) ** 2) / 2);
-      case 'linear':
-      default:
-        return norm;
-    }
-  };
-
-  useAnimationFrame(() => {
-    if (!containerRef?.current) return;
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const { x, y } = mousePositionRef.current;
-    if (lastPositionRef.current.x === x && lastPositionRef.current.y === y) {
-      return;
-    }
-    lastPositionRef.current = { x, y };
-
-    letterRefs.current.forEach((letterRef, index) => {
-      if (!letterRef) return;
-
-      const rect = letterRef.getBoundingClientRect();
-      const letterCenterX = rect.left + rect.width / 2 - containerRect.left;
-      const letterCenterY = rect.top + rect.height / 2 - containerRect.top;
-
-      const distance = calculateDistance(
-        mousePositionRef.current.x,
-        mousePositionRef.current.y,
-        letterCenterX,
-        letterCenterY
-      );
-
-      if (distance >= radius) {
-        letterRef.style.fontVariationSettings = fromFontVariationSettings;
-        return;
-      }
-
-      const falloffValue = calculateFalloff(distance);
-      const newSettings = parsedSettings
-        .map(({ axis, fromValue, toValue }) => {
-          const interpolatedValue = fromValue + (toValue - fromValue) * falloffValue;
-          return `'${axis}' ${interpolatedValue}`;
-        })
-        .join(', ');
-
-      interpolatedSettingsRef.current[index] = newSettings;
-      letterRef.style.fontVariationSettings = newSettings;
-    });
-  });
-
-  const words = label.split(' ');
-  let letterIndex = 0;
-
-  return (
-    <span
-      ref={ref}
-      className={`${className} variable-proximity`}
-      onClick={onClick}
-      style={{ display: 'inline', ...style }}
-      {...restProps}
-    >
-      {words.map((word, wordIndex) => (
-        <span key={wordIndex} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
-          {word.split('').map(letter => {
-            const currentLetterIndex = letterIndex++;
-            return (
-              <motion.span
-                key={currentLetterIndex}
-                ref={el => {
-                  letterRefs.current[currentLetterIndex] = el;
-                }}
-                style={{
-                  display: 'inline-block',
-                  fontVariationSettings: interpolatedSettingsRef.current[currentLetterIndex]
-                }}
-                aria-hidden="true"
-              >
-                {letter}
-              </motion.span>
-            );
-          })}
-          {wordIndex < words.length - 1 && <span style={{ display: 'inline-block' }}>&nbsp;</span>}
-        </span>
-      ))}
-      <span className="sr-only">{label}</span>
-    </span>
-  );
-});
-
-VariableProximity.displayName = 'VariableProximity';
-export default VariableProximity;
-
   </script>
 </body>
 </html>
-
